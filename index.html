@@ -139,7 +139,7 @@
     align-items: center;
     gap: 8px;
     background: rgba(255,255,255,.14);
-    border: 1px solid rgba(255,255,22,.22);
+    border: 1px solid rgba(255,255,255,.22);
     border-radius: 12px;
     padding: 9px 18px;
     font-weight: 700;
@@ -522,7 +522,7 @@
     <div id="map"></div>
     <div class="map-legend">
       <span>📖 Muzeum Biblii (cel)</span>
-      <span>🚆 Stacja kolejowa PKP</span>
+      <span>🚆 Stacja kolejowa</span>
     </div>
   </section>
 
@@ -587,12 +587,12 @@
     <ul class="nice">
       <li>
         <div class="station-left">
-          <span class="em">⭐</span>
+          <span class="em">🚆</span>
           <div>
             <a href="https://maps.app.goo.gl/9EkTJ2MWAeFiSeNy7" target="_blank" rel="noopener">Ustroń Brzegi</a>
             <span class="best-badge">Najbliżej!</span>
             <div style="font-size: 13px; color: var(--green-700); margin-top: 2px;">
-              Z peronu w prawo, w prawo i jeszcze raz w prawo — zaledwie ok. 160–300 m spacerem do muzeum.
+              Z peronu w prawo, w prawo i jeszcze raz w prawo.
             </div>
           </div>
         </div>
@@ -665,6 +665,15 @@
 
 <!-- ════════════════ LEAFLET SCRIPT ════════════════ -->
 <script>
+/* ══════════════════════════════════════════════════════════════
+   USTAWIENIA PRZESUNIĘCIA (OFFSET) EMOTEK NA MAPIE
+   Zmieniaj poniższe wartości (w pikselach):
+   - EMOJI_OFFSET_X: ujemna wartość przesuwa w LEWO, dodatnia w PRAWO
+   - EMOJI_OFFSET_Y: ujemna wartość przesuwa w GÓRĘ, dodatnia w DÓŁ
+══════════════════════════════════════════════════════════════ */
+const EMOJI_OFFSET_X = -1.35;
+const EMOJI_OFFSET_Y = 8;
+
 const MUSEUM = {
   name: "Muzeum Biblii (OdwykCamp)",
   coords: [49.71010755891343, 18.820436752038397],
@@ -677,29 +686,25 @@ const STATIONS = [
     name: "Stacja Ustroń Brzegi",
     dist: "300 m",
     coords: [49.70981816879402, 18.82121888192632],
-    url: "https://maps.app.goo.gl/9EkTJ2MWAeFiSeNy7",
-    isClosest: true
+    url: "https://maps.app.goo.gl/9EkTJ2MWAeFiSeNy7"
   },
   {
     name: "Stacja Ustroń Zdrój",
     dist: "1,5 km",
     coords: [49.721228216207955, 18.81563135888526],
-    url: "https://maps.app.goo.gl/5p7u79fQdbxqG8SH6",
-    isClosest: false
+    url: "https://maps.app.goo.gl/5p7u79fQdbxqG8SH6"
   },
   {
     name: "Stacja Ustroń Polana",
     dist: "1,7 km",
     coords: [49.6966313493954, 18.82984629998973],
-    url: "https://maps.app.goo.gl/Lwf4GzTxte3RvhJL6",
-    isClosest: false
+    url: "https://maps.app.goo.gl/Lwf4GzTxte3RvhJL6"
   },
   {
     name: "Stacja Ustroń",
     dist: "2,5 km",
     coords: [49.72790934981423, 18.803009999989722],
-    url: "https://maps.app.goo.gl/vhWEwLNY78LSpvSN7",
-    isClosest: false
+    url: "https://maps.app.goo.gl/vhWEwLNY78LSpvSN7"
   }
 ];
 
@@ -713,7 +718,19 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 function makeEmojiIcon(emoji, size = 30) {
   return L.divIcon({
     className: '',
-    html: `<div style="font-size:${size}px;line-height:1;text-align:center;width:${size}px;filter:drop-shadow(0 2px 5px rgba(0,0,0,.4));user-select:none;">${emoji}</div>`,
+    html: `<div style="
+      font-size: ${size}px;
+      line-height: 1;
+      text-align: center;
+      width: ${size}px;
+      height: ${size}px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translate(${EMOJI_OFFSET_X}px, ${EMOJI_OFFSET_Y}px);
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,.4));
+      user-select: none;
+    ">${emoji}</div>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size]
   });
@@ -730,7 +747,7 @@ const allBounds = [MUSEUM.coords];
 
 STATIONS.forEach(s => {
   allBounds.push(s.coords);
-  const icon = makeEmojiIcon(s.isClosest ? '⭐' : '🚆', s.isClosest ? 32 : 26);
+  const icon = makeEmojiIcon('🚆', 28);
   const marker = L.marker(s.coords, { icon }).addTo(map);
   marker.bindPopup(`<b>${s.name}</b> (${s.dist})<br><a href="${s.url}" target="_blank" rel="noopener">📍 Google Maps</a>`);
 });
