@@ -19,7 +19,6 @@
     other: '📍'
   };
 
-  // Bezpieczne escapowanie HTML + automatyczna czcionka GrilledCheese dla "OdwykCamp"
   function escapeHtml(str) {
     return String(str ?? '')
       .replace(/&/g, '&amp;')
@@ -37,8 +36,9 @@
   function renderHero() {
     document.title = camp.pageTitle || 'OdwykCamp';
     const heroEl = document.getElementById('hero');
+    const tiles = camp.tiles || [];
 
-    const tilesHtml = (camp.tiles || [])
+    const tilesHtml = tiles
       .map(tile => {
         const val = tile.url
           ? `<a href="${escapeHtml(tile.url)}" target="_blank" rel="noopener">${brandify(tile.value)}</a>`
@@ -63,21 +63,50 @@
         </div>
         ${camp.subtitle ? `<p class="hero-subtitle">${brandify(camp.subtitle)}</p>` : ''}
         ${camp.description ? `<p class="hero-desc">${brandify(camp.description)}</p>` : ''}
-        <div class="hero-tiles">${tilesHtml}</div>
+        <div class="hero-tiles" data-count="${tiles.length}">${tilesHtml}</div>
       </div>
     `;
   }
 
-  /* ════════════════ 2. MAPA + TRASY SAMOCHODOWE OSRM ════════════════ */
+  /* ════════════════ 2. MAPA (100% DARMOWE WARSTWY BEZ KLUCZA API) + TRASY OSRM ════════════════ */
   const map = L.map('map', { scrollWheelZoom: true }).setView(meetingPoint.coords, 13);
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-  }).addTo(map);
+  const cleanStreetLayer = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, HERE, Garmin, USGS, Intermap, NASA, NGA, OpenStreetMap'
+    }
+  );
 
-  // Rejestr warstw do podświetlania i filtrowania
-  const entityLayers = new Map(); // id -> { markers: [], polyline: L.Polyline | null, bounds: L.LatLngBounds, category: string }
+  const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  });
+
+  const satelliteLayer = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'
+    }
+  );
+
+  cleanStreetLayer.addTo(map);
+
+  L.control
+    .layers(
+      {
+        'Mapa czysta': cleanStreetLayer,
+        'OpenStreetMap': osmLayer,
+        'Satelita': satelliteLayer
+      },
+      null,
+      { position: 'topright' }
+    )
+    .addTo(map);
+
+  const entityLayers = new Map();
   const categoryLayers = {
     meeting: [],
     driver: [],
@@ -98,7 +127,6 @@
     });
   }
 
-  // Pinezka miejsca spotkania
   const meetingMarker = L.marker(meetingPoint.coords, {
     icon: createPinIcon('pin-meeting', '🏕️'),
     zIndexOffset: 500
@@ -112,7 +140,6 @@
 
   categoryLayers.meeting.push(meetingMarker);
 
-  // Punkty POI (stacje, sklepy)
   pois.forEach(poi => {
     const emoji = POI_ICONS[poi.type] || POI_ICONS.other;
     const marker = L.marker(poi.coords, {
@@ -129,7 +156,6 @@
     categoryLayers[catKey].push(marker);
   });
 
-  // Pobieranie trasy drogowej z darmowego OSRM (z pamięcią podręczną sesji i fallbackiem)
   async function getDrivingRoute(waypoints) {
     const cacheKey = 'odwyk_route_' + waypoints.map(c => c.join(',')).join('|');
     const cached = sessionStorage.getItem(cacheKey);
@@ -177,7 +203,6 @@
   async function initParticipantsOnMap() {
     const allPoints = [meetingPoint.coords, ...pois.map(p => p.coords)];
 
-    // 1. Kierowcy + trasy
     for (let i = 0; i < drivers.length; i++) {
       const drv = drivers[i];
       const color = drv.color || DEFAULT_ROUTE_COLORS[i % DEFAULT_ROUTE_COLORS.length];
@@ -228,7 +253,6 @@
       const bounds = L.latLngBounds(routeInfo.latLngs);
       entityLayers.set(drv.id, { markers, polyline, bounds, category: 'driver' });
 
-      // Synchronizacja najechania z mapy na tabelę
       const bindHover = target => {
         target.on('mouseover', () => highlightEntity(drv.id));
         target.on('mouseout', () => clearHighlight());
@@ -237,7 +261,6 @@
       bindHover(polyline);
     }
 
-    // 2. Szukający podwózki
     passengers.forEach(pax => {
       allPoints.push(pax.fromCoords);
       const marker = L.marker(pax.fromCoords, {
@@ -599,7 +622,6 @@
     document.getElementById('footer').innerHTML = brandify(footerText);
   }
 
-  // Start aplikacji
   renderHero();
   renderLegend();
   renderPeople();

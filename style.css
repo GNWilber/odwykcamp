@@ -1,6 +1,9 @@
 @font-face {
   font-family: 'GrilledCheese';
-  src: url('GrilledCheese_BTN_Regular.ttf') format('truetype');
+  src:
+    local('GrilledCheese BTN'),
+    url('./GrilledCheese_BTN_Regular.woff2') format('woff2'),
+    url('./GrilledCheese_BTN_Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -89,7 +92,7 @@ body {
 .hero-inner {
   position: relative;
   z-index: 1;
-  max-width: 820px;
+  max-width: 840px;
   margin: 0 auto;
 }
 
@@ -97,25 +100,22 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 18px;
   flex-wrap: wrap;
   margin-bottom: 14px;
 }
 
 .hero-logo {
-  width: 68px;
-  height: 68px;
+  width: 88px;
+  height: 88px;
   object-fit: contain;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  display: block;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.38));
 }
 
 .hero h1 {
   margin: 0;
-  font-size: clamp(32px, 6vw, 54px);
+  font-size: clamp(34px, 6vw, 56px);
   line-height: 1.1;
   color: #ffffff;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
@@ -135,22 +135,38 @@ body {
   max-width: 680px;
 }
 
+/* Symetryczne kafelki na dole baneru (zero samotnych kafelków) */
 .hero-tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 12px;
   text-align: left;
 }
 
+/* Domyślnie (np. 3, 5, 6 kafelków): maksymalnie 3 w rzędzie, ostatni rząd wyśrodkowany */
 .hero-tile {
+  flex: 0 1 calc(33.333% - 8px);
+  min-width: 220px;
   background: rgba(11, 34, 23, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-sm);
-  padding: 13px 16px;
+  padding: 14px 16px;
   backdrop-filter: blur(6px);
   display: flex;
   align-items: flex-start;
   gap: 12px;
+}
+
+/* 1 kafelek: wyśrodkowany */
+.hero-tiles[data-count="1"] .hero-tile {
+  flex: 0 1 380px;
+}
+
+/* 2 lub 4 kafelki: zawsze równy układ 2x1 lub 2x2 */
+.hero-tiles[data-count="2"] .hero-tile,
+.hero-tiles[data-count="4"] .hero-tile {
+  flex: 0 1 calc(50% - 6px);
 }
 
 .hero-tile-ico {
@@ -335,7 +351,7 @@ h2 {
   width: 34px;
   height: 34px;
   font-size: 16px;
-  border-radius: 10px; /* Kwadrat z zaokrągleniem odróżnia pasażerów od kółek kierowców */
+  border-radius: 10px;
 }
 
 .custom-pin.pin-poi {
@@ -765,6 +781,14 @@ footer {
   }
 }
 
+@media (max-width: 720px) {
+  /* Na tabletach i średnich ekranach wszystkie wielokafelkowe układy przechodzą na 2 kolumny */
+  .hero-tile {
+    flex: 0 1 calc(50% - 6px);
+    min-width: 0;
+  }
+}
+
 @media (max-width: 600px) {
   .wrap {
     padding: 12px 12px 48px;
@@ -772,6 +796,11 @@ footer {
 
   .hero {
     padding: 28px 18px 24px;
+  }
+
+  .hero-logo {
+    width: 74px;
+    height: 74px;
   }
 
   .card {
@@ -785,5 +814,12 @@ footer {
   .poi-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 500px) {
+  /* Na wąskich telefonach kafelki jeden pod drugim na pełną szerokość */
+  .hero-tiles .hero-tile {
+    flex: 1 1 100%;
   }
 }
