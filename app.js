@@ -68,8 +68,13 @@
     `;
   }
 
-  /* ════════════════ 2. MAPA (100% DARMOWE WARSTWY BEZ KLUCZA API) + TRASY OSRM ════════════════ */
+  /* ════════════════ 2. MAPA (DOMYŚLNIE OPENSTREETMAP, POTEM CZYSTA I SATELITA) ════════════════ */
   const map = L.map('map', { scrollWheelZoom: true }).setView(meetingPoint.coords, 13);
+
+  const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  });
 
   const cleanStreetLayer = L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
@@ -79,11 +84,6 @@
     }
   );
 
-  const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  });
-
   const satelliteLayer = L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     {
@@ -92,13 +92,13 @@
     }
   );
 
-  cleanStreetLayer.addTo(map);
+  osmLayer.addTo(map);
 
   L.control
     .layers(
       {
-        'Mapa czysta': cleanStreetLayer,
         'OpenStreetMap': osmLayer,
+        'Mapa czysta': cleanStreetLayer,
         'Satelita': satelliteLayer
       },
       null,
@@ -527,7 +527,7 @@
     });
   }
 
-  /* ════════════════ 4. KAFELKI KONTAKT + DISCORD ════════════════ */
+  /* ════════════════ 4. KAFELKI KONTAKT + DISCORD (BEZ EMOTEK NA PRZYCISKACH) ════════════════ */
   function renderCTA() {
     document.getElementById('cta-row').innerHTML = `
       <div class="cta-card cta-host">
@@ -537,7 +537,7 @@
           <p>${brandify(contact.hostText)}</p>
         </div>
         <a class="btn-cta" href="mailto:${escapeHtml(contact.hostEmail)}">
-          📩 ${escapeHtml(contact.hostButtonLabel)}
+          ${escapeHtml(contact.hostButtonLabel)}
         </a>
       </div>
 
@@ -548,7 +548,7 @@
           <p>${brandify(contact.discordText)}</p>
         </div>
         <a class="btn-cta" href="${escapeHtml(contact.discordUrl)}" target="_blank" rel="noopener">
-          🚀 ${escapeHtml(contact.discordButtonLabel)}
+          ${escapeHtml(contact.discordButtonLabel)}
         </a>
       </div>
     `;
