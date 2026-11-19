@@ -6,7 +6,7 @@
   <title>OdwykCamp</title>
 
   <meta property="og:title" content="OdwykCamp" />
-  <meta property="og:description" content="Zgromadzenie obozowe OdwykCamp — informacje, mapa dojazdu i podwózki." />
+  <meta property="og:description" content="Na razie nie planujemy żadnego OdwykCampu." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="favicon.png" />
   <meta name="theme-color" content="#1d4f37" />
@@ -15,67 +15,48 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css?v=3" />
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 720px;
+      padding: 20px 16px;
+    }
+    .empty-state-hero {
+      padding: 48px 32px;
+    }
+    .empty-state-text {
+      font-size: clamp(16px, 2.5vw, 19px);
+      color: rgba(255, 255, 255, 0.95);
+      margin: 10px auto 28px;
+      max-width: 520px;
+      line-height: 1.65;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <!-- 1. BANNER GŁÓWNY -->
-    <header class="hero" id="hero"></header>
-
-    <!-- 2. MAPA + LEGENDA -->
-    <section class="card map-section" aria-labelledby="map-heading">
-      <div class="section-header">
-        <h2 id="map-heading"><span class="ico">🗺️</span> Mapa dojazdu i uczestnicy</h2>
-        <div class="map-controls">
-          <button type="button" class="btn-chip" id="btn-fit-all">Pokaż wszystkie trasy</button>
-          <button type="button" class="btn-chip" id="btn-fit-camp">Zbliż na miejsce obozu</button>
+  <main class="wrap">
+    <header class="hero empty-state-hero">
+      <div class="hero-inner">
+        <div class="hero-brand-row">
+          <img src="favicon.png" alt="Logo OdwykCamp" class="hero-logo">
+          <h1><span class="brand-font">OdwykCamp</span></h1>
         </div>
+        <p class="empty-state-text">
+          Na razie nie planujemy żadnego <span class="brand-font">OdwykCampu</span>.<br>
+          Chcesz być gospodarzem następnego? Napisz na Discord.
+        </p>
+        <a class="btn-cta" href="https://discord.gg/PBTQbRYrj6" target="_blank" rel="noopener">
+          Dołącz na Discord (#obozy)
+        </a>
       </div>
-
-      <div id="map" role="region" aria-label="Interaktywna mapa obozu"></div>
-      <div class="map-legend" id="map-legend"></div>
-    </section>
-
-    <!-- 3. TABELA UCZESTNIKÓW (KIEROWCY + SZUKAJĄCY PODWÓZKI) -->
-    <section class="card people-section" aria-labelledby="people-heading">
-      <div class="section-header">
-        <h2 id="people-heading"><span class="ico">🚘</span> Uczestnicy i podwózki</h2>
-        <span class="hint-text">Najedź lub kliknij osobę, aby podświetlić na mapie</span>
-      </div>
-
-      <!-- Sekcja A: Kierowcy -->
-      <div class="people-group">
-        <div class="group-title group-drivers">
-          <span>🚗 Kierowcy (oferują podwózkę)</span>
-          <span class="count-badge" id="drivers-count">0</span>
-        </div>
-        <div class="people-table" id="drivers-list"></div>
-      </div>
-
-      <!-- Sekcja B: Szukający podwózki -->
-      <div class="people-group">
-        <div class="group-title group-passengers">
-          <span>🙋 Szukający podwózki</span>
-          <span class="count-badge" id="passengers-count">0</span>
-        </div>
-        <div class="people-table" id="passengers-list"></div>
-      </div>
-    </section>
-
-    <!-- 4. KONTAKT DO GOSPODARZA I DISCORD -->
-    <div class="cta-row" id="cta-row"></div>
-
-    <!-- 5. SZCZEGÓŁY OBOZU, STACJE I DOJAZD -->
-    <section class="card info-section" id="info-section"></section>
-
-    <!-- STOPKA -->
-    <footer id="footer"></footer>
-  </div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="camp-data.js?v=3"></script>
-  <script src="app.js?v=3"></script>
+    </header>
+  </main>
 </body>
 </html>
